@@ -9,7 +9,7 @@ const BASE_URL = 'https://docente-cepreuna-production.up.railway.app';
 
 // Función para generar un CAPTCHA desde el servidor
 function generarCaptcha() {
-    fetch(`${BASE_URL}/api/generar-captcha`)
+    fetch(`https://docente-cepreuna-production.up.railway.app/api/generar-captcha`)
         .then(response => response.json())
         .then(data => {
             captcha = data.captcha; // Guardar el CAPTCHA generado
