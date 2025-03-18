@@ -4,28 +4,23 @@ document.addEventListener('DOMContentLoaded', function () {
 
 let captcha; // Variable para almacenar el CAPTCHA generado
 
-// URL base del backend de Railway
-const BASE_URL = 'https://docente-cepreuna-production.up.railway.app';
-
-// Función para generar un CAPTCHA desde el servidor
+// Función para generar un CAPTCHA
 function generarCaptcha() {
-    fetch(`https://docente-cepreuna-production.up.railway.app/api/generar-captcha`)
-        .then(response => response.json())
-        .then(data => {
-            captcha = data.captcha; // Guardar el CAPTCHA generado
-            document.getElementById('captchaText').innerText = captcha; // Mostrar el CAPTCHA en el HTML
-        })
-        .catch(error => {
-            console.error('Error al generar el CAPTCHA:', error);
-        });
+    captcha = Math.floor(Math.random() * 9000) + 1000; // Número aleatorio de 4 dígitos
+    document.getElementById('captchaText').innerText = captcha; // Mostrar el CAPTCHA en el HTML
 }
 
 function consultarEstado() {
-    const dni = document.getElementById('dni').value;
-    const captchaInput = document.getElementById('captchaInput').value;
+    const dni = document.getElementById('dni')?.value;
+    const captchaInput = document.getElementById('captchaInput')?.value;
     const resultadoDiv = document.getElementById('resultado');
 
-    // Validar CAPTCHA en el frontend (opcional, para mejorar la experiencia del usuario)
+    if (!dni || !captchaInput) {
+        alert('Por favor, completa todos los campos.');
+        return;
+    }
+
+    // Validar CAPTCHA en el frontend
     if (captchaInput != captcha) {
         alert('CAPTCHA incorrecto. Intenta de nuevo.');
         generarCaptcha(); // Generar un nuevo CAPTCHA
@@ -34,7 +29,7 @@ function consultarEstado() {
     }
 
     // Enviar solicitud al servidor
-    fetch(`${BASE_URL}/api/consultar`, {
+    fetch('/api/consultar', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
@@ -51,11 +46,15 @@ function consultarEstado() {
         return response.json();
     })
     .then(data => {
+        // Determinar la clase CSS para el estado (APTO o NO APTO)
         const estadoClass = data.estado === "Apto" ? "estado-apto" : "estado-no-apto";
+
+        // Determinar el mensaje adicional según el estado
         const mensajeAdicional = data.estado === "Apto" ?
             "La asignación de carga horaria será paulatinamente mientras los estudiantes se vayan inscribiendo al nuevo ciclo marzo-julio 2025 del CEPREUNA. No todos los APTOS tendrán carga horaria, pero son elegibles para ello." :
             "Gracias por su participación.";
 
+        // Mostrar los resultados con los estilos aplicados
         resultadoDiv.innerHTML = `
             <div class="resultado">
                 <p class="nombre">Nombre: <strong>${data.nombre}</strong></p>
@@ -67,6 +66,6 @@ function consultarEstado() {
     .catch(error => {
         console.error('Error:', error);
         resultadoDiv.innerHTML = `<p>Error: ${error.error || 'No se pudo cargar la información.'}</p>`;
-        generarCaptcha();
+        generarCaptcha(); // Generar un nuevo CAPTCHA en caso de error
     });
 }
