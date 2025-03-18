@@ -4,9 +4,12 @@ document.addEventListener('DOMContentLoaded', function () {
 
 let captcha; // Variable para almacenar el CAPTCHA generado
 
+// URL base del backend de Railway
+const BASE_URL = 'https://docente-cepreuna-production.up.railway.app';
+
 // Función para generar un CAPTCHA desde el servidor
 function generarCaptcha() {
-    fetch('/api/generar-captcha')
+    fetch(`${BASE_URL}/api/generar-captcha`)
         .then(response => response.json())
         .then(data => {
             captcha = data.captcha; // Guardar el CAPTCHA generado
@@ -31,7 +34,7 @@ function consultarEstado() {
     }
 
     // Enviar solicitud al servidor
-    fetch('/api/consultar', {
+    fetch(`${BASE_URL}/api/consultar`, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
@@ -48,15 +51,11 @@ function consultarEstado() {
         return response.json();
     })
     .then(data => {
-        // Determinar la clase CSS para el estado (APTO o NO APTO)
         const estadoClass = data.estado === "Apto" ? "estado-apto" : "estado-no-apto";
-
-        // Determinar el mensaje adicional según el estado
         const mensajeAdicional = data.estado === "Apto" ?
             "La asignación de carga horaria será paulatinamente mientras los estudiantes se vayan inscribiendo al nuevo ciclo marzo-julio 2025 del CEPREUNA. No todos los APTOS tendrán carga horaria, pero son elegibles para ello." :
             "Gracias por su participación.";
 
-        // Mostrar los resultados con los estilos aplicados
         resultadoDiv.innerHTML = `
             <div class="resultado">
                 <p class="nombre">Nombre: <strong>${data.nombre}</strong></p>
@@ -68,6 +67,6 @@ function consultarEstado() {
     .catch(error => {
         console.error('Error:', error);
         resultadoDiv.innerHTML = `<p>Error: ${error.error || 'No se pudo cargar la información.'}</p>`;
-        generarCaptcha(); // Generar un nuevo CAPTCHA en caso de error
+        generarCaptcha();
     });
 }
