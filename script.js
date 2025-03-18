@@ -29,7 +29,7 @@ function consultarEstado() {
     }
 
     // Enviar solicitud al servidor
-    fetch('/api/consultar', {
+    fetch('https://docente-cepreuna-production.up.railway.app/api/consultar', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
